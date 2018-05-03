@@ -8,12 +8,12 @@ class SignIn extends Component {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (err) console.error(err)
-      wretch('http://localhost:5000/data')
-        .json(values)
-        .post()
-        .json(res => {
-          console.log(res)
-        })
+      wretch('http://localhost:5000/auth').json(values).post().json(res => {
+        wretch('http://localhost:5000/data')
+          .auth(`Bearer ${res.token}`)
+          .get()
+          .json(console.log)
+      })
     })
   }
   render () {
