@@ -74,5 +74,5 @@ app.get('/data', authenticate, function (req, res) {
 })
 
 app.listen(5000, function () {
-  console.log('server is running.............')
+  console.log('Server is running on http://localhost:5000/')
 })
