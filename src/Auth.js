@@ -1,44 +1,33 @@
 import React, { Component } from 'react'
-import { Button } from 'antd'
+import { Route, Switch } from 'react-router-dom'
+
+import { Tabs } from 'antd'
 import SignUp from './SignUp'
 import SignIn from './SignIn'
 import './Auth.css'
+
+const Routes = p => (
+  <Switch>
+    <Route path='/auth/' exact component={SignIn} />
+    <Route path='/auth/new' component={SignUp} />
+  </Switch>
+)
+
+const { TabPane } = Tabs
 class Auth extends Component {
-  state = {
-    showIn: false,
-    showUp: false
-  }
   render () {
     return (
-      <div>
-
-        <Button
-          onClick={() => {
-            this.setState({
-              showIn: true,
-              showUp: false
-            })
+      <div className='auth--root'>
+        <Tabs
+          onChange={route => {
+            this.props.history.push('/auth' + route)
           }}
-          type='primary'
-          htmlType='submit'
+          className='auth--tabs'
+          type='card'
         >
-          SignIn
-        </Button>
-        <Button
-          type='primary'
-          htmlType='submit'
-          onClick={() => {
-            this.setState({
-              showIn: false,
-              showUp: true
-            })
-          }}
-        >
-          SignUp
-        </Button>
-
-        {this.state.showIn && <SignIn />}
-        {this.state.showUp && <SignUp />}
+          <TabPane key='/' tab='Sign In'><Routes /></TabPane>
+          <TabPane key='/new' tab='Sign Up'><Routes /></TabPane>
+        </Tabs>
       </div>
     )
   }

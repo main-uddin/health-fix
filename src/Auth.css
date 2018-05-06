@@ -1,6 +1,15 @@
-.login-form {
-  max-width: 300px;
-}
+
 .login-form-button{
   width: 100%;
+}
+
+.auth--root {
+  flex-basis: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth--tabs {
+  min-width: 300px;
 }
