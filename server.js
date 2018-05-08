@@ -10,7 +10,8 @@ const meals = [
   {
     breakfast: 'ruti',
     lunch: 'rice',
-    dinner: 'rice'
+    dinner: 'rice',
+    subscribers: []
   },
   {
     breakfast: 'khechori',
@@ -97,8 +98,33 @@ app.get('/data', authenticate, function (req, res) {
 })
 
 app.get('/meals', authenticate, function (req, res) {
-  console.log(req.user)
-  res.json({ meals })
+  const mealsList = meals.map(meal => {
+    const subscribed =
+      meal.subscribers && meal.subscribers.indexOf(req.user.userName) > -1
+    const { lunch, dinner, breakfast } = meal
+    return { lunch, dinner, breakfast, subscribed }
+  })
+  res.json(mealsList)
+})
+
+app.put('/meals/:id', authenticate, function (req, res) {
+  if (!meals[req.params.id]) {
+    res.status(404).json({ ok: false, message: 'meal not found' })
+    return
+  }
+  const oldsub = meals[req.params.id]['subscribers']
+  meals[req.params.id]['subscribers'] = [].concat(oldsub || [], req.user.userName)
+  res.json({ ok: true, message: 'subscribed to meal ' + req.params.id })
+})
+
+app.delete('/meals/:id', authenticate, function (req, res) {
+  if (!meals[req.params.id] || !meals[req.params.id]['subscribers']) {
+    res.status(404).json({ ok: false, message: 'meal not found or not subscribed' })
+    return
+  }
+  const subIdx = meals[req.params.id]['subscribers'].indexOf(req.user.userName)
+  meals[req.params.id]['subscribers'].splice(subIdx, 1)
+  res.json({ ok: true, message: 'unsubscribed from meal ' + req.params.id })
 })
 
 app.listen(5000, function () {
