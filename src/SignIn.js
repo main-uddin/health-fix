@@ -1,6 +1,7 @@
 import wretch from 'wretch'
 import React, { Component } from 'react'
 import { Form, Icon, Input, Button } from 'antd'
+import { inject } from 'mobx-react'
 const FormItem = Form.Item
 
 class SignIn extends Component {
@@ -12,13 +13,10 @@ class SignIn extends Component {
         .json(values)
         .post()
         .json()
-        .then(({ token }) =>
-          wretch('http://localhost:5000/data')
-            .auth(`Bearer ${token}`)
-            .get()
-            .json()
-        )
-        .then(console.log)
+        .then(({ token }) => this.props.db.put('token', token))
+        .then(() => {
+          this.props.history.push('/meals')
+        })
     })
   }
   render () {
@@ -49,4 +47,4 @@ class SignIn extends Component {
   }
 }
 
-export default Form.create()(SignIn)
+export default inject('db')(Form.create()(SignIn))

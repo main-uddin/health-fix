@@ -11,6 +11,7 @@
     "jsonwebtoken": "^8.2.1",
     "leveldown": "^3.0.1",
     "levelup": "^2.0.2",
+    "localstorage-down": "^0.6.7",
     "mobx": "^4.2.0",
     "mobx-react": "^5.0.0",
     "passport": "^0.4.0",

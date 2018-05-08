@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { Route, Switch } from 'react-router-dom'
 
 import { Tabs } from 'antd'
@@ -14,23 +14,20 @@ const Routes = p => (
 )
 
 const { TabPane } = Tabs
-class Auth extends Component {
-  render () {
-    return (
-      <div className='auth--root'>
-        <Tabs
-          onChange={route => {
-            this.props.history.push('/auth' + route)
-          }}
-          className='auth--tabs'
-          type='card'
-        >
-          <TabPane key='/' tab='Sign In'><Routes /></TabPane>
-          <TabPane key='/new' tab='Sign Up'><Routes /></TabPane>
-        </Tabs>
-      </div>
-    )
-  }
-}
+
+const Auth = p => (
+  <div className='auth--root'>
+    <Tabs
+      onChange={route => {
+        p.history.push('/auth' + route)
+      }}
+      className='auth--tabs'
+      type='card'
+    >
+      <TabPane key='/' tab='Sign In'><Routes /></TabPane>
+      <TabPane key='/new' tab='Sign Up'><Routes /></TabPane>
+    </Tabs>
+  </div>
+)
 
 export default Auth

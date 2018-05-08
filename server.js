@@ -6,6 +6,29 @@ const leveldown = require('leveldown')
 const encodingDown = require('encoding-down')
 const jwt = require('jsonwebtoken')
 
+const meals = [
+  {
+    breakfast: 'ruti',
+    lunch: 'rice',
+    dinner: 'rice'
+  },
+  {
+    breakfast: 'khechori',
+    lunch: 'nanna-biriyani',
+    dinner: 'ruti'
+  },
+  {
+    breakfast: 'porota',
+    lunch: 'shahi-morog-polaw',
+    dinner: 'rice'
+  },
+  {
+    breakfast: 'tehari',
+    lunch: 'absoulate',
+    dinner: 'gaza'
+  }
+]
+
 const passport = require('passport')
 const { ExtractJwt, Strategy: JwtStrategy } = require('passport-jwt')
 
@@ -71,6 +94,11 @@ app.post('/auth', (req, res) => {
 
 app.get('/data', authenticate, function (req, res) {
   res.json({ message: 'fuck you' })
+})
+
+app.get('/meals', authenticate, function (req, res) {
+  console.log(req.user)
+  res.json({ meals })
 })
 
 app.listen(5000, function () {
