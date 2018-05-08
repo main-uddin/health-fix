@@ -113,13 +113,18 @@ app.put('/meals/:id', authenticate, function (req, res) {
     return
   }
   const oldsub = meals[req.params.id]['subscribers']
-  meals[req.params.id]['subscribers'] = [].concat(oldsub || [], req.user.userName)
+  meals[req.params.id]['subscribers'] = [].concat(
+    oldsub || [],
+    req.user.userName
+  )
   res.json({ ok: true, message: 'subscribed to meal ' + req.params.id })
 })
 
 app.delete('/meals/:id', authenticate, function (req, res) {
   if (!meals[req.params.id] || !meals[req.params.id]['subscribers']) {
-    res.status(404).json({ ok: false, message: 'meal not found or not subscribed' })
+    res
+      .status(404)
+      .json({ ok: false, message: 'meal not found or not subscribed' })
     return
   }
   const subIdx = meals[req.params.id]['subscribers'].indexOf(req.user.userName)
