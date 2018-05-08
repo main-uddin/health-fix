@@ -5,20 +5,41 @@ import { inject } from 'mobx-react'
 const FormItem = Form.Item
 
 class SignIn extends Component {
+  state = {
+    buttonType: 'primary',
+    iconType: 'user'
+  }
+
   handleSubmit = e => {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (err) console.error(err)
+      this.setState({
+        iconType: 'loading'
+      })
       wretch('http://localhost:5000/auth')
         .json(values)
         .post()
         .json()
         .then(({ token }) => this.props.db.put('token', token))
         .then(() => {
-          this.props.history.push('/meals')
+          setTimeout(() => {
+            this.props.history.push('/meals')
+          }, 1e3)
+          this.setState({ iconType: 'check', buttonType: 'success' })
+        })
+        .catch(res => {
+          if (!res.ok) {
+            this.setState({ iconType: 'close', buttonType: 'danger' })
+            this.props.form.resetFields()
+            setTimeout(() => {
+              this.setState({ iconType: 'user', buttonType: 'primary' })
+            }, 3e3)
+          }
         })
     })
   }
+
   render () {
     const { getFieldDecorator } = this.props.form
     return (
@@ -39,8 +60,12 @@ class SignIn extends Component {
             />
           )}
         </FormItem>
-        <Button type='primary' htmlType='submit' className='login-form-button'>
-          Log in
+        <Button
+          type={this.state.buttonType}
+          htmlType='submit'
+          className='login-form-button'
+        >
+          <Icon type={this.state.iconType} />Log in
         </Button>
       </Form>
     )
