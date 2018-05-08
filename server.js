@@ -6,30 +6,6 @@ const leveldown = require('leveldown')
 const encodingDown = require('encoding-down')
 const jwt = require('jsonwebtoken')
 
-const meals = [
-  {
-    breakfast: 'ruti',
-    lunch: 'rice',
-    dinner: 'rice',
-    subscribers: []
-  },
-  {
-    breakfast: 'khechori',
-    lunch: 'nanna-biriyani',
-    dinner: 'ruti'
-  },
-  {
-    breakfast: 'porota',
-    lunch: 'shahi-morog-polaw',
-    dinner: 'rice'
-  },
-  {
-    breakfast: 'tehari',
-    lunch: 'absoulate',
-    dinner: 'gaza'
-  }
-]
-
 const passport = require('passport')
 const { ExtractJwt, Strategy: JwtStrategy } = require('passport-jwt')
 
@@ -63,6 +39,31 @@ app.use(passport.initialize())
 
 const authenticate = passport.authenticate('jwt', { session: false })
 
+// TODO: move to database
+const meals = [
+  {
+    breakfast: 'ruti',
+    lunch: 'rice',
+    dinner: 'rice',
+    subscribers: []
+  },
+  {
+    breakfast: 'khechori',
+    lunch: 'nanna-biriyani',
+    dinner: 'ruti'
+  },
+  {
+    breakfast: 'porota',
+    lunch: 'shahi-morog-polaw',
+    dinner: 'rice'
+  },
+  {
+    breakfast: 'tehari',
+    lunch: 'absoulate',
+    dinner: 'gaza'
+  }
+]
+
 app.put('/auth', function (req, res) {
   const { userName, email, password } = req.body
   db
@@ -93,10 +94,6 @@ app.post('/auth', (req, res) => {
     })
 })
 
-app.get('/data', authenticate, function (req, res) {
-  res.json({ message: 'fuck you' })
-})
-
 app.get('/meals', authenticate, function (req, res) {
   const mealsList = meals.map(meal => {
     const subscribed =
@@ -113,10 +110,7 @@ app.put('/meals/:id', authenticate, function (req, res) {
     return
   }
   const oldsub = meals[req.params.id]['subscribers']
-  meals[req.params.id]['subscribers'] = [].concat(
-    oldsub || [],
-    req.user.userName
-  )
+  meals[req.params.id]['subscribers'] = (oldsub || []).concat(req.user.userName)
   res.json({ ok: true, message: 'subscribed to meal ' + req.params.id })
 })
 
