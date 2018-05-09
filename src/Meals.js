@@ -10,13 +10,15 @@ const { Header, Sider, Content } = Layout
 
 class Meals extends Component {
   state = {
-    loading: true,
-    dataArr: [],
+    loading: <Icon type='loading' />,
+    mealPlans: [],
+    isAdmin: false,
     buttonContent: true
   }
 
   render () {
     return (
+      this.state.loading ||
       <Layout className='meals--root'>
         <Header className='meals--header'>
           <span>Health Fix</span>
@@ -31,6 +33,8 @@ class Meals extends Component {
             >
               <Menu.Item key='/'>Home</Menu.Item>
               <Menu.Item key='/meals'>Meals</Menu.Item>
+              {this.state.isAdmin &&
+                <Menu.Item key='/add-meals'>Add Meals</Menu.Item>}
               <Menu.Item key='/log-out'>Log out</Menu.Item>
             </Menu>
           </Sider>
@@ -44,12 +48,12 @@ class Meals extends Component {
             >
               <List
                 itemLayout='horizontal'
-                dataSource={this.state.dataArr}
+                dataSource={this.state.mealPlans}
                 renderItem={(item, ind) => (
                   <List.Item className='meal--item'>
                     <Timeline>
                       {Array.from(Object.entries(item), ([time, meal], idx) => {
-                        if (time === 'subscribed') return
+                        if (time === 'subscribed') return ''
                         return (
                           <Timeline.Item
                             dot={<Icon type='clock-circle-o' />}
@@ -84,13 +88,19 @@ class Meals extends Component {
           .json()
       )
       .then(data => {
-        this.setState({
+        this.setState(p => ({
           loading: false,
-          dataArr: this.state.dataArr.concat(data)
-        })
-        console.log('from database: ', data)
-        console.log('from state:', this.state.dataArr)
+          mealPlans: p.mealPlans.concat(data)
+        }))
       })
+      .then(() => this.props.db.get('token'))
+      .then(token =>
+        wretch('http://localhost:5000/admin')
+          .auth(`Bearer ${token}`)
+          .get()
+          .json()
+      )
+      .then(({ admin }) => this.setState({ isAdmin: admin }))
       .catch(() => this.props.history.push('/auth'))
   }
 

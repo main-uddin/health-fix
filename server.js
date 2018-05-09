@@ -5,15 +5,14 @@ const up = require('levelup')
 const down = require('leveldown')
 const encode = require('encoding-down')
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 
 const passport = require('passport')
 const { ExtractJwt, Strategy: JwtStrategy } = require('passport-jwt')
 
 const app = express()
 const userdb = up(encode(down('./db/users'), { valueEncoding: 'json' }))
-// const mealsdb = levelup(
-//   encodingDown(leveldown('./db/meals'), { valueEncoding: 'json' })
-// )
+// const mealsdb = up(encode(down('./db/meals'), { valueEncoding: 'json' }))
 
 var jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -26,8 +25,8 @@ passport.use(
     userdb
       .get(payload.userName)
       .then(user => {
-        const { userName, email } = user
-        cb(null, { userName, email })
+        const { userName, email, admin } = user
+        cb(null, { userName, email, admin: admin || false })
       })
       .catch(err => {
         if (err) console.error(err)
@@ -69,8 +68,9 @@ const meals = [
 
 app.put('/auth', function (req, res) {
   const { userName, email, password } = req.body
-  userdb
-    .put(userName, { userName, email, password })
+  bcrypt
+    .hash(password, 9)
+    .then(hash => userdb.put(userName, { userName, email, password: hash }))
     .then(() => {
       res.json({ ok: true, message: 'Data sucessfully inserted!' })
     })
@@ -83,8 +83,9 @@ app.post('/auth', (req, res) => {
   const { userName, password } = req.body
   userdb
     .get(userName)
-    .then(data => {
-      if (data.password === password) {
+    .then(data => bcrypt.compare(password, data.password))
+    .then(correct => {
+      if (correct) {
         const token = jwt.sign({ userName }, jwtOptions.secretOrKey)
         res.json({ ok: true, token })
       } else {
@@ -129,11 +130,20 @@ app.delete('/meals/:id', authenticate, function (req, res) {
   res.json({ ok: true, message: 'unsubscribed from meal ' + req.params.id })
 })
 
+app.get('/admin', authenticate, (req, res) => {
+  res.json({ admin: req.user.admin })
+})
+
+// app.post('/meals', authenticate, (req, res) => {
+//   const {}
+//   mealsdb.put(meals, )
+// })
+
 app.listen(5000, function () {
   userdb
     .put('admin', {
       userName: 'admin',
-      password: 'admin',
+      password: bcrypt.hashSync('admin', 9),
       email: 'admin@gmail.com',
       admin: true
     })
