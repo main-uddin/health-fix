@@ -1,16 +1,19 @@
 const cors = require('cors')
 const express = require('express')
 const bodyParser = require('body-parser')
-const levelup = require('levelup')
-const leveldown = require('leveldown')
-const encodingDown = require('encoding-down')
+const up = require('levelup')
+const down = require('leveldown')
+const encode = require('encoding-down')
 const jwt = require('jsonwebtoken')
 
 const passport = require('passport')
 const { ExtractJwt, Strategy: JwtStrategy } = require('passport-jwt')
 
 const app = express()
-const db = levelup(encodingDown(leveldown('./mydb'), { valueEncoding: 'json' }))
+const userdb = up(encode(down('./db/users'), { valueEncoding: 'json' }))
+// const mealsdb = levelup(
+//   encodingDown(leveldown('./db/meals'), { valueEncoding: 'json' })
+// )
 
 var jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -20,7 +23,7 @@ var jwtOptions = {
 passport.use(
   new JwtStrategy(jwtOptions, function (payload, cb) {
     if (!payload.userName) return cb(null, false)
-    db
+    userdb
       .get(payload.userName)
       .then(user => {
         const { userName, email } = user
@@ -66,7 +69,7 @@ const meals = [
 
 app.put('/auth', function (req, res) {
   const { userName, email, password } = req.body
-  db
+  userdb
     .put(userName, { userName, email, password })
     .then(() => {
       res.json({ ok: true, message: 'Data sucessfully inserted!' })
@@ -78,7 +81,7 @@ app.put('/auth', function (req, res) {
 
 app.post('/auth', (req, res) => {
   const { userName, password } = req.body
-  db
+  userdb
     .get(userName)
     .then(data => {
       if (data.password === password) {
@@ -127,5 +130,12 @@ app.delete('/meals/:id', authenticate, function (req, res) {
 })
 
 app.listen(5000, function () {
-  console.log('Server is running on http://localhost:5000/')
+  userdb
+    .put('admin', {
+      userName: 'admin',
+      password: 'admin',
+      email: 'admin@gmail.com',
+      admin: true
+    })
+    .then(() => console.log('Server is running on http://localhost:5000/'))
 })
