@@ -1,3 +1,16 @@
 .meals--root {
   flex-basis: 100%;
 }
+
+.meals--header {
+  text-align: center;
+  color: #fff;
+}
+
+.meals--header span {
+  font-size: 2em;
+}
+
+.meal--item div {
+  justify-content: space-between;
+}
