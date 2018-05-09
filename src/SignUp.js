@@ -4,22 +4,15 @@ import { Form, Icon, Input, Button } from 'antd'
 import './Auth.css'
 const FormItem = Form.Item
 class SignUp extends Component {
-  handleSignUp = e => {
-    e.preventDefault()
-    this.props.form.validateFields((err, values) => {
-      if (err) console.error(err)
-      wretch('http://localhost:5000/auth')
-        .json(values)
-        .put()
-        .json(res => {
-          console.log(res)
-        })
-    })
+  state = {
+    buttonType: 'primary',
+    iconType: 'user-add'
   }
+
   render () {
     const { getFieldDecorator } = this.props.form
     return (
-      <Form onSubmit={this.handleSignUp} className='login-form'>
+      <Form onSubmit={this.handleSubmit} className='login-form'>
         <FormItem>
           {getFieldDecorator('userName', {
             rules: [{ required: true, message: 'Please input your username!' }]
@@ -41,11 +34,44 @@ class SignUp extends Component {
             />
           )}
         </FormItem>
-        <Button type='primary' htmlType='submit' className='login-form-button'>
-          SignUp
+        <Button
+          type={this.state.buttonType}
+          htmlType='submit'
+          className='login-form-button'
+        >
+          <Icon type={this.state.iconType} /> SignUp
         </Button>
       </Form>
     )
+  }
+
+  handleSubmit = e => {
+    e.preventDefault()
+    this.props.form.validateFields((err, values) => {
+      if (err) console.error(err)
+      this.setState({
+        iconType: 'loading'
+      })
+      wretch('http://localhost:5000/auth')
+        .json(values)
+        .put()
+        .json(res => {
+          this.setState({ iconType: 'check', buttonType: 'success' })
+          this.props.form.resetFields()
+          setTimeout(() => {
+            this.props.history.push('/auth/')
+          }, 1e3)
+        })
+        .catch(res => {
+          if (!res.ok) {
+            this.setState({ iconType: 'close', buttonType: 'danger' })
+            this.props.form.resetFields()
+            setTimeout(() => {
+              this.setState({ iconType: 'user', buttonType: 'primary' })
+            }, 3e3)
+          }
+        })
+    })
   }
 }
 
