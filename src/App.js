@@ -3,7 +3,7 @@ import { inject } from 'mobx-react'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import Auth from './Auth'
 import Home from './Home'
-import Meals from './Meals'
+import ShowMeals from './ShowMeals'
 import AddMeals from './AddMeals'
 
 import './App.css'
@@ -20,7 +20,7 @@ class App extends Component {
         <Switch>
           <Route path='/' exact component={Home} />
           <Route path='/auth' component={Auth} />
-          <Route path='/meals' component={Meals} />
+          <Route path='/meals' component={ShowMeals} />
           <Route path='/add-meals' component={AddMeals} />
           <Route path='/log-out' component={inject('db')(LogOut)} />
         </Switch>
