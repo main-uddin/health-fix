@@ -41,31 +41,6 @@ app.use(passport.initialize())
 
 const authenticate = passport.authenticate('jwt', { session: false })
 
-// TODO: move to database
-const meals = [
-  {
-    breakfast: 'ruti',
-    lunch: 'rice',
-    dinner: 'rice',
-    subscribers: []
-  },
-  {
-    breakfast: 'khechori',
-    lunch: 'nanna-biriyani',
-    dinner: 'ruti'
-  },
-  {
-    breakfast: 'porota',
-    lunch: 'shahi-morog-polaw',
-    dinner: 'rice'
-  },
-  {
-    breakfast: 'tehari',
-    lunch: 'absoulate',
-    dinner: 'gaza'
-  }
-]
-
 app.put('/auth', function (req, res) {
   const { userName, email, password } = req.body
   bcrypt
@@ -129,17 +104,21 @@ app.post('/meals', authenticate, async (req, res) => {
   }
 })
 
-app.put('/meals/:id', authenticate, function (req, res) {
+app.put('/meals/:id', authenticate, async (req, res) => {
+  const meals = await mealsdb.get('meals')
   if (!meals[req.params.id]) {
     res.status(404).json({ ok: false, message: 'meal not found' })
     return
   }
   const oldsub = meals[req.params.id]['subscribers']
   meals[req.params.id]['subscribers'] = (oldsub || []).concat(req.user.userName)
-  res.json({ ok: true, message: 'subscribed to meal ' + req.params.id })
+  mealsdb.put('meals', meals).then(() => {
+    res.json({ ok: true, message: 'subscribed to meal ' + req.params.id })
+  })
 })
 
-app.delete('/meals/:id', authenticate, function (req, res) {
+app.delete('/meals/:id', authenticate, async (req, res) => {
+  const meals = await mealsdb.get('meals')
   if (!meals[req.params.id] || !meals[req.params.id]['subscribers']) {
     res
       .status(404)
@@ -148,7 +127,9 @@ app.delete('/meals/:id', authenticate, function (req, res) {
   }
   const subIdx = meals[req.params.id]['subscribers'].indexOf(req.user.userName)
   meals[req.params.id]['subscribers'].splice(subIdx, 1)
-  res.json({ ok: true, message: 'unsubscribed from meal ' + req.params.id })
+  mealsdb.put('meals', meals).then(() => {
+    res.json({ ok: true, message: 'unsubscribed from meal ' + req.params.id })
+  })
 })
 
 app.get('/admin', authenticate, (req, res) => {
