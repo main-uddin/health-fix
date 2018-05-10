@@ -51,7 +51,7 @@ class SignIn extends Component {
   handleSubmit = e => {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
-      if (err) console.error(err)
+      if (err) return console.error(err)
       this.setState({
         iconType: 'loading'
       })
@@ -67,13 +67,11 @@ class SignIn extends Component {
           this.setState({ iconType: 'check', buttonType: 'success' })
         })
         .catch(res => {
-          if (!res.ok) {
-            this.setState({ iconType: 'close', buttonType: 'danger' })
-            this.props.form.resetFields()
-            setTimeout(() => {
-              this.setState({ iconType: 'user', buttonType: 'primary' })
-            }, 3e3)
-          }
+          this.setState({ iconType: 'close', buttonType: 'danger' })
+          this.props.form.resetFields()
+          setTimeout(() => {
+            this.setState({ iconType: 'user', buttonType: 'primary' })
+          }, 3e3)
         })
     })
   }

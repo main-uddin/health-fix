@@ -56,21 +56,23 @@ class ShowMeals extends Component {
   }
 
   componentDidMount () {
-    this.props.db
-      .get('token')
-      .then(token =>
-        wretch('http://localhost:5000/meals')
-          .auth(`Bearer ${token}`)
-          .get()
-          .json()
-      )
-      .then(data => {
-        this.setState(p => ({
-          loading: false,
-          mealPlans: p.mealPlans.concat(data)
-        }))
-      })
-      .catch(() => this.props.history.push('/auth'))
+    this.props.db.get('token').then(token =>
+      wretch('http://localhost:5000/meals')
+        .auth(`Bearer ${token}`)
+        .get()
+        .error(404, res =>
+          this.setState({ loading: <div>No Meals Available!</div> })
+        )
+        .error(401, res => {
+          this.props.history.push('/auth')
+        })
+        .json(data => {
+          this.setState(p => ({
+            loading: false,
+            mealPlans: p.mealPlans.concat(data)
+          }))
+        })
+    )
   }
 
   toggleSub = idx => subd => {

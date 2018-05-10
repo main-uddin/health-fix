@@ -22,7 +22,9 @@ const FormItem = p => (
 
 class AddMeals extends Component {
   state = {
-    loading: <Icon type='loading' />
+    loading: <Icon type='loading' />,
+    iconType: 'plus',
+    buttonType: 'primary'
   }
 
   render () {
@@ -62,8 +64,8 @@ class AddMeals extends Component {
                 wrapperCol: { span: 14, offset: 4 }
               }}
             >
-              <Button type='primary' htmlType='submit'>
-                <Icon type='plus' />Add Meal
+              <Button type={this.state.buttonType} htmlType='submit'>
+                <Icon type={this.state.iconType} />Add Meal
               </Button>
             </Form.Item>
           </Form>}
@@ -74,10 +76,33 @@ class AddMeals extends Component {
   addMeals = e => {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
-      if (err) console.error(err)
-      wretch('http://localhost:5000/meals').json(values).post().json(res => {
-        console.log(res)
+      if (err) return console.error(err)
+      this.setState({
+        iconType: 'loading'
       })
+      this.props.db.get('token').then(token =>
+        wretch('http://localhost:5000/meals')
+          .auth(`Bearer ${token}`)
+          .json(values)
+          .post()
+          .json(res => {
+            console.log(res)
+          })
+          .then(() => {
+            this.setState({ iconType: 'check', buttonType: 'success' })
+            this.props.form.resetFields()
+            setTimeout(() => {
+              this.setState({ iconType: 'plus', buttonType: 'primary' })
+            }, 1e3)
+          })
+          .catch(() => {
+            this.setState({ iconType: 'close', buttonType: 'danger' })
+            this.props.form.resetFields()
+            setTimeout(() => {
+              this.setState({ iconType: 'plus', buttonType: 'primary' })
+            }, 3e3)
+          })
+      )
     })
   }
 

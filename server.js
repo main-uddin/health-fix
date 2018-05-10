@@ -12,7 +12,7 @@ const { ExtractJwt, Strategy: JwtStrategy } = require('passport-jwt')
 
 const app = express()
 const userdb = up(encode(down('./db/users'), { valueEncoding: 'json' }))
-// const mealsdb = up(encode(down('./db/meals'), { valueEncoding: 'json' }))
+const mealsdb = up(encode(down('./db/meals'), { valueEncoding: 'json' }))
 
 var jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -98,14 +98,35 @@ app.post('/auth', (req, res) => {
     })
 })
 
-app.get('/meals', authenticate, function (req, res) {
-  const mealsList = meals.map(meal => {
-    const subscribed =
-      meal.subscribers && meal.subscribers.indexOf(req.user.userName) > -1
-    const { lunch, dinner, breakfast } = meal
-    return { lunch, dinner, breakfast, subscribed }
-  })
-  res.json(mealsList)
+app.get('/meals', authenticate, async (req, res) => {
+  try {
+    const meals = await mealsdb.get('meals')
+    const mealsList = meals.map(meal => {
+      const subscribed =
+        meal.subscribers && meal.subscribers.indexOf(req.user.userName) > -1
+      const { lunch, dinner, breakfast } = meal
+      return { lunch, dinner, breakfast, subscribed }
+    })
+    res.json(mealsList)
+  } catch (error) {
+    res.status(404).json({ ok: true, error })
+  }
+})
+
+app.post('/meals', authenticate, async (req, res) => {
+  let meals = []
+  try {
+    const oldMeals = await mealsdb.get('meals')
+    meals = oldMeals
+  } catch (error) {
+    console.error(error)
+  }
+  try {
+    const response = await mealsdb.put('meals', meals.concat(req.body))
+    res.json({ ok: true, message: 'meal successfully added', response })
+  } catch (error) {
+    res.status(500).json({ ok: false, error })
+  }
 })
 
 app.put('/meals/:id', authenticate, function (req, res) {
@@ -133,11 +154,6 @@ app.delete('/meals/:id', authenticate, function (req, res) {
 app.get('/admin', authenticate, (req, res) => {
   res.json({ admin: req.user.admin })
 })
-
-// app.post('/meals', authenticate, (req, res) => {
-//   const {}
-//   mealsdb.put(meals, )
-// })
 
 app.listen(5000, function () {
   userdb

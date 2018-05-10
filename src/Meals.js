@@ -59,7 +59,9 @@ class Meals extends Component {
           .json()
       )
       .then(({ admin }) => this.setState({ isAdmin: admin }))
-      .catch(() => this.props.history.push('/auth'))
+      .catch(res => {
+        this.props.history.push('/auth')
+      })
   }
 }
 export default Meals

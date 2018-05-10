@@ -48,7 +48,7 @@ class SignUp extends Component {
   handleSubmit = e => {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
-      if (err) console.error(err)
+      if (err) return console.error(err)
       this.setState({
         iconType: 'loading'
       })
