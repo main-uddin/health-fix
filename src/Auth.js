@@ -23,6 +23,7 @@ const Auth = p => (
       }}
       className='auth--tabs'
       type='card'
+      activeKey={p.location.pathname.replace('/auth', '') || '/'}
     >
       <TabPane key='/' tab='Sign In'><Routes /></TabPane>
       <TabPane key='/new' tab='Sign Up'><Routes /></TabPane>
