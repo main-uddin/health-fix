@@ -41,6 +41,13 @@ class SignIn extends Component {
     )
   }
 
+  componentDidMount () {
+    this.props.db
+      .get('token')
+      .then(() => this.props.history.push('/meals'))
+      .catch(() => console.log('Welcome!'))
+  }
+
   handleSubmit = e => {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {

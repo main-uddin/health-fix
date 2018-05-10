@@ -1,6 +1,8 @@
-import React, { Component } from 'react'
-import { Layout, Menu } from 'antd'
 import wretch from 'wretch'
+import React, { Component } from 'react'
+import { Layout, Menu, Icon } from 'antd'
+import MdLocalRestaurant from 'react-icons/lib/md/local-restaurant'
+
 import './Meals.css'
 
 const { Header, Sider, Content } = Layout
@@ -24,11 +26,17 @@ class Meals extends Component {
               style={{ height: '100%', borderRight: 0 }}
               onSelect={({ key }) => this.props.history.push(`${key}`)}
             >
-              <Menu.Item key='/'>Home</Menu.Item>
-              <Menu.Item key='/meals'>Meals</Menu.Item>
+              <Menu.Item key='/'><Icon type='home' />Home</Menu.Item>
+              <Menu.Item key='/meals'>
+                <Icon><MdLocalRestaurant /></Icon>Meals
+              </Menu.Item>
               {this.state.isAdmin &&
-                <Menu.Item key='/add-meals'>Add Meals</Menu.Item>}
-              <Menu.Item key='/log-out'>Log out</Menu.Item>
+                <Menu.Item key='/add-meals'>
+                  <Icon type='plus' />Add Meals
+                </Menu.Item>}
+              <Menu.Item key='/log-out'>
+                <Icon type='user-delete' />Log out
+              </Menu.Item>
             </Menu>
           </Sider>
           <Layout>
