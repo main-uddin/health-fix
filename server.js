@@ -12,6 +12,8 @@ if (env.error) throw env.error
 const { pickOnly } = require('./utils/')
 const { seedAdmin, levelDB } = require('./utils/db')
 
+const usersdb = levelDB('users')
+
 const app = express()
 
 const jwtOptions = {
@@ -23,7 +25,7 @@ passport.use(
   new JwtStrategy(jwtOptions, async (payload, cb) => {
     try {
       if (!payload.userName) throw new Error('User not found!')
-      const user = await levelDB('users').get(payload.userName)
+      const user = await usersdb.get(payload.userName)
       cb(null, pickOnly(['userName', 'email', 'admin'], user))
     } catch (err) {
       cb(null, false)
@@ -37,7 +39,7 @@ app.use(passport.initialize())
 
 const authenticate = passport.authenticate('jwt', { session: false })
 
-app.use('/auth', require('./routes/auth'))
+app.use('/auth', require('./routes/auth')(usersdb))
 app.use('/meals', require('./routes/meals'))
 
 app.get('/admin', authenticate, (req, res) => {
@@ -45,7 +47,7 @@ app.get('/admin', authenticate, (req, res) => {
 })
 
 app.listen(5000, function () {
-  seedAdmin().then(() =>
+  seedAdmin(usersdb).then(() =>
     console.log('Server is running on http://localhost:5000/')
   )
 })
