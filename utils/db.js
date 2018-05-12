@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt')
 const up = require('levelup')
 const down = require('leveldown')
 const encode = require('encoding-down')
