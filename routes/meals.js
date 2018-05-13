@@ -30,7 +30,7 @@ route.get('/', authenticate, async (req, res) => {
 route.post('/', authenticate, (req, res) => {
   mealsdb.get('meals', async (_, meals) => {
     try {
-      const reply = await mealsdb.put('meals', meals.concat(req.body))
+      const reply = await mealsdb.put('meals', (meals || []).concat(req.body))
       res.json({
         ok: true,
         message: 'New meal plan successfully added',
