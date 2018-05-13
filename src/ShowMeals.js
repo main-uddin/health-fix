@@ -57,7 +57,7 @@ class ShowMeals extends Component {
 
   componentDidMount () {
     this.props.db.get('token').then(token =>
-      wretch('http://localhost:5000/meals')
+      wretch('http://health.server_one.local/meals')
         .auth(`Bearer ${token}`)
         .get()
         .error(404, res =>
@@ -79,7 +79,7 @@ class ShowMeals extends Component {
     this.props.db
       .get('token')
       .then(token =>
-        wretch(`http://localhost:5000/meals/${idx}`)
+        wretch(`http://health.server_one.local/meals/${idx}`)
           .auth(`Bearer ${token}`)[subd ? 'delete' : 'put']()
           .json()
       )

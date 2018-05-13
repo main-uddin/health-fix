@@ -53,7 +53,7 @@ class Meals extends Component {
     this.props.db
       .get('token')
       .then(token =>
-        wretch('http://localhost:5000/admin')
+        wretch('http://health.server_one.local/admin')
           .auth(`Bearer ${token}`)
           .get()
           .json()

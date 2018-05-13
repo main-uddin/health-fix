@@ -52,7 +52,7 @@ class SignUp extends Component {
       this.setState({
         iconType: 'loading'
       })
-      wretch('http://localhost:5000/auth')
+      wretch('http://health.server_one.local/auth')
         .json(values)
         .put()
         .json(res => {

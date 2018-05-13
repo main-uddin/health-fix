@@ -81,7 +81,7 @@ class AddMeals extends Component {
         iconType: 'loading'
       })
       this.props.db.get('token').then(token =>
-        wretch('http://localhost:5000/meals')
+        wretch('http://health.server_one.local/meals')
           .auth(`Bearer ${token}`)
           .json(values)
           .post()
@@ -110,7 +110,7 @@ class AddMeals extends Component {
     this.props.db
       .get('token')
       .then(token =>
-        wretch('http://localhost:5000/admin')
+        wretch('http://health.server_one.local/admin')
           .auth(`Bearer ${token}`)
           .get()
           .json()
