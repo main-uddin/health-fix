@@ -1,7 +1,7 @@
 {
   "name": "health-fix",
   "version": "0.1.0",
-  "homepage": "http://server_one.local/",
+  "homepage": "/",
   "private": true,
   "dependencies": {
     "antd": "^3.4.4",
