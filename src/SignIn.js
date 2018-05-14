@@ -1,9 +1,10 @@
-import wretch from 'wretch'
 import React, { Component } from 'react'
 import { Form, Icon, Input, Button } from 'antd'
 import { inject } from 'mobx-react'
-const FormItem = Form.Item
 
+import api from './api'
+
+const FormItem = Form.Item
 class SignIn extends Component {
   state = {
     buttonType: 'primary',
@@ -55,7 +56,8 @@ class SignIn extends Component {
       this.setState({
         iconType: 'loading'
       })
-      wretch('http://health.server_one.local/auth')
+      api
+        .url('/auth')
         .json(values)
         .post()
         .json()

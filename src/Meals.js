@@ -1,8 +1,8 @@
-import wretch from 'wretch'
 import React, { Component } from 'react'
 import { Layout, Menu, Icon } from 'antd'
 import MdLocalRestaurant from 'react-icons/lib/md/local-restaurant'
 
+import api from './api'
 import './Meals.css'
 
 const { Header, Sider, Content } = Layout
@@ -53,7 +53,7 @@ class Meals extends Component {
     this.props.db
       .get('token')
       .then(token =>
-        wretch('http://health.server_one.local/admin')
+        api.url('/admin')
           .auth(`Bearer ${token}`)
           .get()
           .json()

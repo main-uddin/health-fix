@@ -1,8 +1,8 @@
-import wretch from 'wretch'
 import React, { Component } from 'react'
 import { inject } from 'mobx-react'
 import { Icon, List, Timeline } from 'antd'
 
+import api from './api'
 import Meals from './Meals'
 import SubButton from './SubscribeButton'
 import './ShowMeals.css'
@@ -57,7 +57,8 @@ class ShowMeals extends Component {
 
   componentDidMount () {
     this.props.db.get('token').then(token =>
-      wretch('http://health.server_one.local/meals')
+      api
+        .url('/meals')
         .auth(`Bearer ${token}`)
         .get()
         .error(404, res =>
@@ -79,7 +80,8 @@ class ShowMeals extends Component {
     this.props.db
       .get('token')
       .then(token =>
-        wretch(`http://health.server_one.local/meals/${idx}`)
+        api
+          .url(`/meals/${idx}`)
           .auth(`Bearer ${token}`)[subd ? 'delete' : 'put']()
           .json()
       )

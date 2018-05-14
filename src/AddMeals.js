@@ -1,9 +1,9 @@
-import wretch from 'wretch'
 import capitalize from 'lodash.capitalize'
 import { inject } from 'mobx-react'
 import React, { Component } from 'react'
 import { Form, Input, Button, Icon } from 'antd'
 
+import api from './api'
 import Meals from './Meals'
 
 const FormItem = p => (
@@ -81,7 +81,8 @@ class AddMeals extends Component {
         iconType: 'loading'
       })
       this.props.db.get('token').then(token =>
-        wretch('http://health.server_one.local/meals')
+        api
+          .url('/meals')
           .auth(`Bearer ${token}`)
           .json(values)
           .post()
@@ -110,7 +111,7 @@ class AddMeals extends Component {
     this.props.db
       .get('token')
       .then(token =>
-        wretch('http://health.server_one.local/admin')
+        api.url('/admin')
           .auth(`Bearer ${token}`)
           .get()
           .json()

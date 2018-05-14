@@ -1,7 +1,9 @@
-import wretch from 'wretch'
 import React, { Component } from 'react'
 import { Form, Icon, Input, Button } from 'antd'
+
+import api from './api'
 import './Auth.css'
+
 const FormItem = Form.Item
 class SignUp extends Component {
   state = {
@@ -52,7 +54,8 @@ class SignUp extends Component {
       this.setState({
         iconType: 'loading'
       })
-      wretch('http://health.server_one.local/auth')
+      api
+        .url('/auth')
         .json(values)
         .put()
         .json(res => {
