@@ -39,7 +39,6 @@ app.use(passport.initialize())
 
 const authenticate = passport.authenticate('jwt', { session: false })
 
-app.options('*', cors())
 app.use('/auth', require('./routes/auth')(usersdb))
 app.use('/meals', require('./routes/meals'))
 
