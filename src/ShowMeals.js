@@ -1,11 +1,12 @@
 import * as R from 'ramda'
 import React, { Component } from 'react'
 import { inject } from 'mobx-react'
-import { Icon, List, Timeline } from 'antd'
+import { Icon, List, Timeline, Button } from 'antd'
 
 import api from './api'
 import Meals from './Meals'
 import SubButton from './SubscribeButton'
+import DeleteButton from './DeleteButton'
 import './ShowMeals.css'
 
 const mealWeight = {
@@ -33,7 +34,8 @@ class ShowMeals extends Component {
   state = {
     loading: <Icon type='loading' />,
     mealPlans: [],
-    buttonContent: true
+    buttonContent: true,
+    isAdmin: false
   }
 
   render () {
@@ -56,10 +58,16 @@ class ShowMeals extends Component {
                 <Timeline>
                   {R.compose(R.map(toTimelineItem), sortMealTimes)(item)}
                 </Timeline>
-                <SubButton
-                  subscribed={item.subscribed}
-                  onToggleSub={this.toggleSub(ind)}
-                />
+                <Button.Group>
+                  <SubButton
+                    subscribed={item.subscribed}
+                    onToggleSub={this.toggleSub(ind)}
+                  />
+                  {this.state.isAdmin &&
+                    <DeleteButton deleteMeal={this.deleteMealData(ind)}>
+                      Delete Meal
+                    </DeleteButton>}
+                </Button.Group>
               </List.Item>
             )}
           />}
@@ -68,7 +76,7 @@ class ShowMeals extends Component {
   }
 
   componentDidMount () {
-    this.props.db.get('token').then(token =>
+    this.props.db.get('token').then(token => {
       api
         .url('/meals')
         .auth(`Bearer ${token}`)
@@ -79,13 +87,16 @@ class ShowMeals extends Component {
         .error(401, res => {
           this.props.history.push('/auth')
         })
-        .json(data => {
+        .json()
+        .then(data => {
           this.setState(p => ({
             loading: false,
             mealPlans: p.mealPlans.concat(data)
           }))
         })
-    )
+        .then(() => api.url('/admin').auth(`Bearer ${token}`).get().json())
+        .then(({ admin }) => this.setState({ isAdmin: admin }))
+    })
   }
 
   toggleSub = idx => subd => {
@@ -98,6 +109,18 @@ class ShowMeals extends Component {
           .json()
       )
       .then(res => console.log(res))
+  }
+  deleteMealData = idx => () => {
+    this.props.db
+      .get('token')
+      .then(token =>
+        api.url(`/meals/${idx}/delete`).auth(`Bearer ${token}`).delete().json()
+      )
+      .then(res => {
+        if (!res.ok) throw new Error('Request Failed!')
+        this.setState(p => ({ mealPlans: R.remove(idx, 1, p.mealPlans) }))
+      })
+      .catch(e => console.warn(e))
   }
 }
 export default inject('db')(ShowMeals)

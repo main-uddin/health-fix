@@ -66,7 +66,7 @@ class SignIn extends Component {
           setTimeout(() => {
             this.props.history.push('/meals')
           }, 1e3)
-          this.setState({ iconType: 'check', buttonType: 'success' })
+          this.setState({ iconType: 'check', buttonType: 'dashed' })
         })
         .catch(res => {
           this.setState({ iconType: 'close', buttonType: 'danger' })

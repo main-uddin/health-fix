@@ -90,7 +90,7 @@ class AddMeals extends Component {
             console.log(res)
           })
           .then(() => {
-            this.setState({ iconType: 'check', buttonType: 'success' })
+            this.setState({ iconType: 'check', buttonType: 'dashed' })
             this.props.form.resetFields()
             setTimeout(() => {
               this.setState({ iconType: 'plus', buttonType: 'primary' })
@@ -124,4 +124,4 @@ class AddMeals extends Component {
   }
 }
 
-export default inject('db')(Form.create()(AddMeals))
+export default Form.create()(inject('db')(AddMeals))

@@ -59,7 +59,7 @@ class SignUp extends Component {
         .json(values)
         .put()
         .json(res => {
-          this.setState({ iconType: 'check', buttonType: 'success' })
+          this.setState({ iconType: 'check', buttonType: 'dashed' })
           this.props.form.resetFields()
           setTimeout(() => {
             this.props.history.push('/auth/')
