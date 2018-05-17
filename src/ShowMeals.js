@@ -1,3 +1,4 @@
+import * as R from 'ramda'
 import React, { Component } from 'react'
 import { inject } from 'mobx-react'
 import { Icon, List, Timeline } from 'antd'
@@ -6,6 +7,27 @@ import api from './api'
 import Meals from './Meals'
 import SubButton from './SubscribeButton'
 import './ShowMeals.css'
+
+const mealWeight = {
+  breakfast: 0,
+  lunch: 1,
+  dinner: 2
+}
+
+const sortMealTimes = R.compose(
+  R.sortBy(([k, v]) => mealWeight[k]),
+  R.toPairs,
+  R.pickAll(R.keys(mealWeight))
+)
+
+const toTimelineItem = ([time, meal]) => (
+  <Timeline.Item
+    dot={<Icon type='clock-circle-o' />}
+    key={Date.now() + Math.random()}
+  >
+    <b>{time.toUpperCase()}: </b>{meal}
+  </Timeline.Item>
+)
 
 class ShowMeals extends Component {
   state = {
@@ -30,19 +52,9 @@ class ShowMeals extends Component {
             itemLayout='horizontal'
             dataSource={this.state.mealPlans}
             renderItem={(item, ind) => (
-              <List.Item className='meal--item'>
+              <List.Item className='meal--item' key={ind}>
                 <Timeline>
-                  {Array.from(Object.entries(item), ([time, meal], idx) => {
-                    if (time === 'subscribed') return ''
-                    return (
-                      <Timeline.Item
-                        dot={<Icon type='clock-circle-o' />}
-                        key={idx}
-                      >
-                        <b>{time.toUpperCase()}: </b>{meal}
-                      </Timeline.Item>
-                    )
-                  })}
+                  {R.compose(R.map(toTimelineItem), sortMealTimes)(item)}
                 </Timeline>
                 <SubButton
                   subscribed={item.subscribed}
